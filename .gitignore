@@ -1,0 +1,6 @@
+.idea/
+*.sqlite
+*.log
+Dockerfile
+data.bak/
+*.pickle
