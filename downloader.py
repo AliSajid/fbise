@@ -82,7 +82,6 @@ def visit(url, rollno, idx):
 
     :param url: 
     :param rollno: 
-    :param invalid: 
     """
     try:
         res = post(url, rollno._asdict())
@@ -101,7 +100,7 @@ def download_data(bounds):
     logger.info("Generating the list of Roll Numbers")
     RNLIST = list(range(from_num, to_num + 1))
 
-    URL = "http://www.fbise.edu.pk/res-ssc-I.php"
+    URL = "http://www.fbise.edu.pk/res-ssc-II.php"
 
     logger.info("Start Parameter is: {}".format(from_num))
     logger.info("End Parameter is: {}".format(to_num))
