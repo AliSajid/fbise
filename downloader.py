@@ -25,11 +25,11 @@ wait = random.choice(distribution)
 # Setting up the option parser
 parser = OptionParser()
 
-parser.add_option("-s", "--start-num", dest="start", type="int", default=300000)
-parser.add_option("-e", "--end-num", dest="end", type="int", default=400000)
-parser.add_option("-l", "--level", dest="level", type="str", default="SSC")
-parser.add_option("-p", "--part", dest="part", type="str", default="I")
-parser.add_option("-t", "--type", dest="type", type="str", default="A")
+parser.add_option("-s", "--start-num", dest="start", type="int")
+parser.add_option("-e", "--end-num", dest="end", type="int")
+parser.add_option("-l", "--level", dest="level", type="str")
+parser.add_option("-p", "--part", dest="part", type="str")
+parser.add_option("-t", "--type", dest="type", type="str")
 
 (options, args) = parser.parse_args()
 
@@ -37,7 +37,7 @@ parser.add_option("-t", "--type", dest="type", type="str", default="A")
 logging.basicConfig(level=logging.DEBUG,
                     format='%(asctime)s %(name)-12s %(levelname)-8s %(message)s',
                     datefmt='%m-%d-%Y %H:%M:%S,',
-                    filename=path.join("logs", "data-{:0>8}-{:0>8}.log".format(options.start, options.end)),
+                    filename=path.join("logs", "data-{:0>6}-{:0>6}.log".format(options.start, options.end)),
                     filemode='a'
                     )
 logger = logging.getLogger(__name__)
