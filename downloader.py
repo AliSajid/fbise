@@ -113,6 +113,7 @@ def visit(url, rollno, idx):
     :param rollno: 
     """
     try:
+        # noinspection PyProtectedMember
         res = post(url, rollno._asdict())
         if res.status_code != 200:
             Record(rollno=rollno[0], html="NULL", error=True, idx=idx)
@@ -125,12 +126,12 @@ def visit(url, rollno, idx):
 
 # noinspection PyTypeChecker, PyTypeChecker
 def download_data(start_num, end_num, level, part, type):
-    from_num, to_num, URL = output_ranges(level, part, type)
+    from_num, to_num, url = output_ranges(level, part, type)
 
     logger.info("Generating the list of Roll Numbers")
     nums = list(range(from_num, to_num + 1))
 
-    RNLIST = [RollNo(str(n), idx, "") for idx, n in enumerate(nums)]
+    rnlist = [RollNo(str(n), idx, "") for idx, n in enumerate(nums)]
 
     logger.info("Start Parameter is: {}".format(start_num))
     logger.info("End Parameter is: {}".format(end_num))
@@ -155,12 +156,12 @@ def download_data(start_num, end_num, level, part, type):
         logger.info("Starting the Brute Force Search from position {}".format(start))
         logger.info("Process started at {}".format(time.strftime('%c')))
 
-        for idx, rn in enumerate(RNLIST[start:end_num]):
+        for idx, rn in enumerate(rnlist[start:end_num]):
             if idx % wait == 0:
                 time.sleep(5)
             if idx % 25 == 0:
                 logger.info("Downloading data for Roll No. {}".format(rn.roll_no))
-            visit(URL, rn, idx=rn.idx)
+            visit(url, rn, idx=rn.idx)
         logger.info("Process ended at {}".format(time.strftime('%c')))
     except KeyboardInterrupt as err:
         logger.exception("{0}".format(err))

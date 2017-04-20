@@ -61,10 +61,9 @@ ranges = [Range(l, p, t, *output_ranges(l, p, t)[:2]) for l in level for p in pa
 pairs = [PairedRange(pair.level, pair.part, pair.type, return_pairs(pair.lowerbound, pair.upperbound),
                      len(return_pairs(pair.lowerbound, pair.upperbound))) for pair in ranges]
 
-command_string = "docker run --detach -v /d/experiments/fbise/data:/app/fbise/data -v /d/experiments/fbise/logs:/app/fbise/logs --name worker{:0>2} localhost:5000/fbise /app/fbise/downloader.py -s {} -e {} -l {} -p {} -t {}\n"
+command_string = "docker run --detach -v /d/experiments/fbise/data:/app/fbise/data -v /d/experiments/fbise/logs:/app/fbise/logs --name worker{:0>2} localhost:5000/fbise /app/fbise/downloader.py -s {} -e {} -l {} -p {} -t {}"
 
-template = """
-#! /bin/bash
+template = """#! /bin/bash
 
 {}
 """
@@ -75,4 +74,4 @@ for pair in pairs:
         for n in range(pair.numbounds):
             commands.append(
                 command_string.format(n, pair.bounds[n][0], pair.bounds[n][1], pair.level, pair.part, pair.type))
-        f.write(template.format('\n'.join(commands)))
+        f.write(template.format('\n\n'.join(commands)))
