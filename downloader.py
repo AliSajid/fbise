@@ -9,6 +9,7 @@ by the roll number, otherwise it commits a NULL to it.
 """
 import logging
 import random
+import sys
 import time
 from collections import namedtuple
 from optparse import OptionParser
@@ -24,10 +25,11 @@ wait = random.choice(distribution)
 # Setting up the option parser
 parser = OptionParser()
 
-parser.add_option("-s", "--start-num", dest="start", type="int", default=0)
-parser.add_option("-e", "--end-num", dest="end", type="int", default=10000000)
+parser.add_option("-s", "--start-num", dest="start", type="int", default=300000)
+parser.add_option("-e", "--end-num", dest="end", type="int", default=400000)
 parser.add_option("-l", "--level", dest="level", type="str", default="SSC")
 parser.add_option("-p", "--part", dest="part", type="str", default="I")
+parser.add_option("-t", "--type", dest="type", type="str", default="A")
 
 (options, args) = parser.parse_args()
 
@@ -54,10 +56,10 @@ console.setFormatter(formatter)
 logger.addHandler(console)
 
 # Named tuple for RollNo
-RollNo = namedtuple("RollNo", ['roll_no', "search"])
+RollNo = namedtuple("RollNo", ['roll_no', "idx", "search"])
 
 # Database Setup
-DBNAME = "data-{:0>8}-{:0>8}.sqlite".format(options.start, options.end)
+DBNAME = "data-{:0>6}-{:0>6}.sqlite".format(options.start, options.end)
 DIRNAME = "data"
 
 db = orm.Database()
@@ -74,12 +76,36 @@ class Record(db.Entity):
 db.generate_mapping(create_tables=True)
 
 
+def output_ranges(level, part, type):
+    if type == "A":
+        if level == "SSC":
+            if part == "I":
+                return 900001, 998600, "http://www.fbise.edu.pk/res-ssc-I.php"
+            if part == "II":
+                return 100001, 199000, "http://www.fbise.edu.pk/res-ssc-II.php"
+        elif level == "HSSC":
+            if part == "I":
+                return 300001, 395100, "http://www.fbise.edu.pk/res-hssc-I.php"
+            if part == "II":
+                return 500001, 595100, "http://www.fbise.edu.pk/res-hssc-II.php"
+        else:
+            logger.critical("Invalid Level, Part or Type. Please check and try again.")
+    elif type == "S":
+        if level == "SSC":
+            return 200001, 282000, "http://www.fbise.edu.pk/res-sscsup.php"
+        if level == "HSSC":
+            return 600001, 695100, "http://www.fbise.edu.pk/res-hsscsup.php"
+    else:
+        logger.critical("Invalid Level, Part or Type. Please check and try again.")
+
+
 @orm.db_session
 def visit(url, rollno, idx):
     """
     This method visits the given site, fills the form, checks if a valid result is generated, adds the valid result 
     and the valid roll number to the valid dict and valid list respectively.
 
+    :param idx: 
     :param url: 
     :param rollno: 
     """
@@ -91,48 +117,55 @@ def visit(url, rollno, idx):
             Record(rollno=rollno[0], html=res.text, error=False, idx=idx)
     except Exception as e:
         logger.error(str(e))
-        Record(rollno1=rollno[0], rollno2=rollno[1], rollno3=rollno[2], html="NULL", error=True, idx=idx)
+        Record(rollno=rollno[0], html="NULL", error=True, idx=idx)
 
 
-def download_data(bounds):
-    (from_num, to_num) = bounds
+# noinspection PyTypeChecker, PyTypeChecker
+def download_data(start_num, end_num, level, part, type):
+    from_num, to_num, URL = output_ranges(level, part, type)
 
     logger.info("Generating the list of Roll Numbers")
-    RNLIST = list(range(from_num, to_num + 1))
+    nums = list(range(from_num, to_num + 1))
 
-    URL = "http://www.fbise.edu.pk/res-ssc-II.php"
+    RNLIST = [RollNo(str(n), idx, "") for idx, n in enumerate(nums)]
 
-    logger.info("Start Parameter is: {}".format(from_num))
-    logger.info("End Parameter is: {}".format(to_num))
+    logger.info("Start Parameter is: {}".format(start_num))
+    logger.info("End Parameter is: {}".format(end_num))
     logger.info("Saving data to database {}".format(DBNAME))
 
     try:
         with orm.db_session:
+            # noinspection PyTypeChecker
             last_record = orm.max(r.id for r in Record)
 
-            if last_record == to_num:
+            if last_record == end_num:
                 logger.info("No new data to download. Exiting...")
                 return
 
             if last_record:
-                last_idx = orm.select(r.rollno for r in Record if r.id == last_record)[:][0]
-                start = int(last_idx)
+                # noinspection PyTypeChecker
+                last_idx = orm.select(r.idx for r in Record if r.id == last_record)[:][0]
+                start = last_idx + 1
             else:
-                start = from_num
+                start = start_num
 
         logger.info("Starting the Brute Force Search from position {}".format(start))
         logger.info("Process started at {}".format(time.strftime('%c')))
 
-        for idx, rn in enumerate(RNLIST[start:to_num]):
-            if idx % wait == 0: time.sleep(5)
+        for idx, rn in enumerate(RNLIST[start:end_num]):
+            if idx % wait == 0:
+                time.sleep(5)
             if idx % 25 == 0:
-                logger.info("Downloading data for Roll No. {}".format("-".join(rn[:3])))
-            visit(URL, rn, idx=rn)
+                logger.info("Downloading data for Roll No. {}".format(rn.roll_no))
+            visit(URL, rn, idx=rn.idx)
         logger.info("Process ended at {}".format(time.strftime('%c')))
-    except KeyboardInterrupt as e:
-        logger.error(str(e))
-        logger.error("Recieved Keyboard Interrupt. Exiting.")
+    except KeyboardInterrupt as err:
+        logger.exception("{0}".format(err))
+        logger.exception("Recieved Keyboard Interrupt. Exiting.")
+    except:
+        logger.exception("Unexpected error:", sys.exc_info()[0])
+        raise
 
 
 if __name__ == '__main__':
-    download_data((options.start, options.end))
+    download_data(options.start, options.end, options.level, options.part, options.type)
