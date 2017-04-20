@@ -4,3 +4,4 @@
 Dockerfile
 data.bak/
 *.pickle
+*.sh$
