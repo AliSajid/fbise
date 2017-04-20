@@ -1,8 +1,6 @@
 from collections import namedtuple
 from optparse import OptionParser
 
-from downloader import output_ranges
-
 # Setting up the option parser
 parser = OptionParser()
 
@@ -30,6 +28,28 @@ else:
     type_ = ["A", "S"]
 
 
+def output_ranges(level, part, type):
+    if type == "A":
+        if level == "SSC":
+            if part == "I":
+                return 900001, 998600, "http://www.fbise.edu.pk/res-ssc-I.php"
+            if part == "II":
+                return 100001, 199000, "http://www.fbise.edu.pk/res-ssc-II.php"
+        elif level == "HSSC":
+            if part == "I":
+                return 300001, 395100, "http://www.fbise.edu.pk/res-hssc-I.php"
+            if part == "II":
+                return 500001, 595100, "http://www.fbise.edu.pk/res-hssc-II.php"
+        else:
+            print("Invalid Level, Part or Type. Please check and try again.")
+    elif type == "S":
+        if level == "SSC":
+            return 200001, 282000, "http://www.fbise.edu.pk/res-sscsup.php"
+        if level == "HSSC":
+            return 600001, 695100, "http://www.fbise.edu.pk/res-hsscsup.php"
+    else:
+        print("Invalid Level, Part or Type. Please check and try again.")
+
 def return_pairs(lower_bound, upper_bound, chunk_size=10000):
     lowers = list(range(0, upper_bound - lower_bound, chunk_size))
     uppers = [num + chunk_size for num in lowers[:-1]] + [lowers[-1] + (upper_bound % chunk_size)]
@@ -41,7 +61,7 @@ ranges = [Range(l, p, t, *output_ranges(l, p, t)[:2]) for l in level for p in pa
 pairs = [PairedRange(pair.level, pair.part, pair.type, return_pairs(pair.lowerbound, pair.upperbound),
                      len(return_pairs(pair.lowerbound, pair.upperbound))) for pair in ranges]
 
-command_string = "docker run --detach -v /d/experiments/fbise/data:/app/fbise/data -v /d/experiments/fbise/logs:/app/logs --name worker{:0>2} localhost:5000/fbise /app/fbise/downloader.py -s {} -e {} -l {} -p {} -t {}\n"
+command_string = "docker run --detach -v /d/experiments/fbise/data:/app/fbise/data -v /d/experiments/fbise/logs:/app/fbise/logs --name worker{:0>2} localhost:5000/fbise /app/fbise/downloader.py -s {} -e {} -l {} -p {} -t {}\n"
 
 template = """
 #! /bin/bash
