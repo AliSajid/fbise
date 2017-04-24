@@ -50,7 +50,8 @@ def output_ranges(level, part, type):
     else:
         print("Invalid Level, Part or Type. Please check and try again.")
 
-def return_pairs(lower_bound, upper_bound, chunk_size=10000):
+
+def return_pairs(lower_bound, upper_bound, chunk_size):
     lowers = list(range(0, upper_bound - lower_bound, chunk_size))
     uppers = [num + chunk_size for num in lowers[:-1]] + [lowers[-1] + (upper_bound % chunk_size)]
     return list(zip(lowers, uppers))
@@ -58,8 +59,9 @@ def return_pairs(lower_bound, upper_bound, chunk_size=10000):
 
 ranges = [Range(l, p, t, *output_ranges(l, p, t)[:2]) for l in level for p in part for t in type_]
 
-pairs = [PairedRange(pair.level, pair.part, pair.type, return_pairs(pair.lowerbound, pair.upperbound),
-                     len(return_pairs(pair.lowerbound, pair.upperbound))) for pair in ranges]
+pairs = [PairedRange(pair.level, pair.part, pair.type,
+                     return_pairs(pair.lowerbound, pair.upperbound, chunk_size=options.chunk),
+                     len(return_pairs(pair.lowerbound, pair.upperbound, chunk_size=options.chunk))) for pair in ranges]
 
 command_string = "docker run --rm --detach -v /d/experiments/fbise/data:/app/fbise/data -v /d/experiments/fbise/logs:/app/logs --name worker{:0>2} localhost:5000/fbise /opt/conda/bin/python /app/fbise/downloader.py -s {} -e {} -l {} -p {} -t {}"
 
