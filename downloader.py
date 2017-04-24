@@ -18,6 +18,8 @@ from os import path
 from pony import orm
 from requests import post
 
+from models import db, Record
+
 # Random wait time
 distribution = list(range(1000, 5001, 500))
 wait = random.choice(distribution)
@@ -65,16 +67,7 @@ DBNAME = "{}-{}-{}-data-{:0>6}-{:0>6}.sqlite".format(options.level, options.part
                                                      options.end)
 DIRNAME = "data"
 
-db = orm.Database()
 db.bind('sqlite', path.join(DIRNAME, DBNAME), create_db=True)
-
-
-class Record(db.Entity):
-    idx = orm.Required(int)
-    rollno = orm.Required(str)
-    html = orm.Required(str)
-    error = orm.Required(bool)
-
 
 db.generate_mapping(create_tables=True)
 
