@@ -5,7 +5,7 @@ from optparse import OptionParser
 from bs4 import BeautifulSoup
 from pony import orm
 
-from models import db, Record
+from models import db, cleandb, Record, Student, Result
 
 # Setting up the option parser
 parser = OptionParser()
@@ -23,12 +23,11 @@ OUTPUTDBNAME = "{}-{}-{}-clean.sqlite".format(options.level, options.part, optio
 db.bind('sqlite', os.path.join(DBDIR, INPUTDBNAME))
 db.generate_mapping()
 
-dbout = orm.Database()
-dbout.bind('sqlite', os.path.join(DBDIR, OUTPUTDBNAME), create_db=True)
-dbout.generate_mapping(create_tables=True)
+cleandb.bind('sqlite', os.path.join(DBDIR, OUTPUTDBNAME), create_db=True)
+cleandb.generate_mapping(create_tables=True)
 
 with orm.db_session:
-    test = orm.select(c for c in Record).limit(10)
+    test = orm.select(c for c in Record if c.error == 0)[:]
 
 
 def split_tables(soup):
@@ -61,7 +60,7 @@ def parse_results(result_soup):
 soup = BeautifulSoup(test[0].html, 'lxml')
 info, result = split_tables(soup)
 info_p = parse_info(info)
-
+res_p = parse_results(result)
 
 @orm.db_session
 def parse_and_store_result(html):
@@ -69,3 +68,36 @@ def parse_and_store_result(html):
     info, result = split_tables(soup)
     parsed_info = parse_info(info)
     parsed_result = parse_results(result)
+    student = Student(rollno=parsed_info["ROLL NO"], name=parsed_info["CANDIDATE NAME"],
+                      father=parsed_info["FATHER  NAME"], institute=parsed_info["INSTITUTE"],
+                      remarks=parsed_info["REMARKS"], result=parsed_info["RESULT"])
+    for row in parsed_result:
+        split = row["SUBJECTS"].split(" - ")
+        if len(split) == 2:
+            subj, part = split
+        else:
+            subj = row["SUBJECTS"].strip()
+            part = ''
+        if row["THEORY"] == "ABS":
+            theory = 999
+        elif row["THEORY"] == "CAN":
+            theory = 998
+        else:
+            theory = int(row["THEORY"])
+
+        if row["PRACTICAL"] == "ABS":
+            practical = 999
+        else:
+            try:
+                practical = int(row["PRACTICAL"])
+            except ValueError:
+                practical = None
+
+        Result(student=student, subject=subj, part=part, theory=theory, practical=practical)
+
+
+for idx, item in enumerate(test):
+    if idx % 50 == 0:
+        print("Cleaning Record Number {}".format(idx))
+    html = item.html
+    parse_and_store_result(html)
