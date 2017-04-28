@@ -5,7 +5,8 @@ from optparse import OptionParser
 from bs4 import BeautifulSoup
 from pony import orm
 
-from models import db, cleandb, Record, Student, Result
+from cleanmodels import cleandb, Student, Result
+from models import db, Record
 
 # Setting up the option parser
 parser = OptionParser()
