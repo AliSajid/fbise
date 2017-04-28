@@ -10,17 +10,22 @@ class Record(db.Entity):
     error = orm.Required(bool)
 
 
-class Student(db.Entity):
+cleandb = orm.Database()
+
+
+class Student(cleandb.Entity):
     rollno = orm.Required(int)
     name = orm.Required(str)
     father = orm.Required(str)
     result = orm.Required(str)
     institute = orm.Required(str)
+    remarks = orm.Optional(str)
+    subjects = orm.Set('Result')
 
 
-class Result(db.Entity):
+class Result(cleandb.Entity):
     student = orm.Required(Student)
     subject = orm.Required(str)
-    part = orm.Required(str)
+    part = orm.Optional(str)
     theory = orm.Required(int)
-    practical = orm.Required(int)
+    practical = orm.Optional(int, nullable=True)
