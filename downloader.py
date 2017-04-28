@@ -40,9 +40,9 @@ logging.basicConfig(level=logging.DEBUG,
                     format='%(asctime)s %(name)-12s %(levelname)-8s %(message)s',
                     datefmt='%m-%d-%Y %H:%M:%S,',
                     filename=path.join("logs",
-                                       "{!s}-{!s}-{!s}-data-{:0>6}-{:0>6}.log".format(options.level, options.part,
-                                                                                      options.type, options.start,
-                                                                                      options.end)),
+                                       "{}-{}-{}-data-{:0>6}-{:0>6}.log".format(options.level, options.part,
+                                                                                options.type, options.start,
+                                                                                options.end)),
                     filemode='a'
                     )
 logger = logging.getLogger(__name__)
@@ -64,8 +64,8 @@ logger.addHandler(console)
 RollNo = namedtuple("RollNo", ['roll_no', "idx", "search"])
 
 # Database Setup
-DBNAME = "{!s}-{!s}-{!s}-data-{:0>6}-{:0>6}.sqlite".format(options.level, options.part, options.type, options.start,
-                                                           options.end)
+DBNAME = "{}-{}-{}-data-{:0>6}-{:0>6}.sqlite".format(options.level, options.part, options.type, options.start,
+                                                     options.end)
 DIRNAME = "data"
 
 db.bind('sqlite', path.join(DIRNAME, DBNAME), create_db=True)
