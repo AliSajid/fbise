@@ -31,6 +31,7 @@ cursor.execute('''CREATE TABLE Record
 
 counter = 1
 for file in files:
+    print("Processing file: {}".format(file))
     file_conn = sqlite3.connect(os.path.join(DBDIR, file))
     file_cursor = file_conn.cursor()
     file_cursor.execute('''SELECT idx, rollno, html, error FROM Record''')
@@ -38,8 +39,9 @@ for file in files:
     for row in data:
         cursor.execute('INSERT INTO Record VALUES (?, ?, ?, ?, ?)', (counter, row[0], row[1], row[2], row[3]))
         counter += 1
-        if counter % 10 == 0:
+        if counter % 1000 == 0:
             conn.commit()
+            print("Thousand more records committed. Total Records: {}".format(counter * 1000))
     conn.commit()
     file_conn.close()
 
