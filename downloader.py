@@ -112,7 +112,14 @@ def visit(url, rollno, idx):
     """
     try:
         # noinspection PyProtectedMember
-        header = {'User-Agent': str(UA.random)}
+
+        header = {'User-Agent': str(UA.random),
+                  "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
+                  "Accept-Encoding": "gzip, deflate, sdch, br",
+                  "Accept-Language": "en-US,en;q=0.8,ur;q=0.6",
+                  "Connection": "close",
+                  "Upgrade-Insecure-Requests": "1",
+                  }
         res = post(url, rollno._asdict(), headers=header)
         if res.status_code != 200:
             Record(rollno=rollno[0], html="NULL", error=True, idx=idx)
