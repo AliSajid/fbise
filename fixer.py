@@ -24,20 +24,20 @@ cursor.execute("""SELECT idx FROM Record WHERE error = 1""")
 errors = [item[0] for item in cursor.fetchall()]
 
 
-def visit(url, rollno, error_idx):
+def visit(url, rollno):
     """
     This method visits the given site, fills the form, checks if a valid result is generated, adds the valid result 
     and the valid roll number to the valid dict and valid list respectively.
 
-    :param error_idx: 
     :param url: 
     :param rollno: 
     """
     try:
         # noinspection PyProtectedMember
         res = post(url, rollno._asdict())
-        if res.status_code != 200:
-            cursor.execute("UPDATE Record SET html = ?, error = 0 WHERE idx = ?", (res.text, error_idx))
+        if res.status_code == 200:
+            cursor.execute("UPDATE Record SET html = ?, error = 0 WHERE idx = ?", (res.text, rollno.idx))
+            conn.commit()
     except Exception as e:
         pass
 
@@ -79,14 +79,10 @@ def download_data(level, part, type):
 
     rnlist = [RollNo(str(n), idx, "") for idx, n in enumerate(nums)]
 
-    for idx, error in enumerate(errors):
-        if idx % 25 == 0:
-            conn.commit()
+    for error in errors:
         print("Getting data for RollNo: {}".format(rnlist[error].roll_no))
-        visit(url, rnlist[error], error)
+        visit(url, rnlist[error])
 
-
-conn.commit()
 
 if __name__ == '__main__':
     download_data(options.level, options.part, options.type)
