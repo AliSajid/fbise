@@ -15,14 +15,18 @@ from collections import namedtuple
 from optparse import OptionParser
 from os import path
 
+from fake_useragent import UserAgent
 from pony import orm
 from requests import post
 
 from models import db, Record
 
 # Random wait time
-distribution = list(range(1000, 5001, 500))
-wait = random.choice(distribution)
+DISTRIBUTION = list(range(50, 101, 10))
+WAIT = random.choice(DISTRIBUTION)
+
+# User Agent Spoofing
+UA = UserAgent()
 
 # Setting up the option parser
 parser = OptionParser()
@@ -108,7 +112,8 @@ def visit(url, rollno, idx):
     """
     try:
         # noinspection PyProtectedMember
-        res = post(url, rollno._asdict())
+        header = {'User-Agent': str(UA.random)}
+        res = post(url, rollno._asdict(), headers=header)
         if res.status_code != 200:
             Record(rollno=rollno[0], html="NULL", error=True, idx=idx)
         else:
@@ -151,7 +156,7 @@ def download_data(start_num, end_num, level, part, type):
         logger.info("Process started at {}".format(time.strftime('%c')))
 
         for idx, rn in enumerate(rnlist[start:end_num]):
-            if idx % wait == 0:
+            if idx % WAIT == 0:
                 time.sleep(5)
             if idx % 25 == 0:
                 logger.info("Downloading data for Roll No. {}".format(rn.roll_no))
