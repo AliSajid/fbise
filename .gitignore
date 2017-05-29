@@ -1,5 +1,6 @@
 .idea/
 *.sqlite
+*.sqlite-journal
 *.log
 data.bak/
 *.pickle

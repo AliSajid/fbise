@@ -41,7 +41,7 @@ for file in files:
         counter += 1
         if counter % 1000 == 0:
             conn.commit()
-            print("Thousand more records committed. Total Records: {}".format(counter * 1000))
+            print("Thousand more records committed. Total Records: {}".format(counter))
     conn.commit()
     file_conn.close()
 
