@@ -68,8 +68,8 @@ logger.addHandler(console)
 RollNo = namedtuple("RollNo", ['roll_no', "idx", "search"])
 
 # Database Setup
-DBNAME = "{}-{}-{}-data-{:0>6}-{:0>6}.sqlite".format(options.level, options.part, options.type, options.start,
-                                                     options.end)
+DBNAME = "{}-{}-{}-data-{:0>6}-{:0>6}-{year}.sqlite".format(options.level, options.part, options.type, options.start,
+                                                            options.end, year=2017)
 DIRNAME = "data"
 
 db.bind('sqlite', path.join(DIRNAME, DBNAME), create_db=True)
@@ -81,21 +81,21 @@ def output_ranges(level, part, type):
     if type == "A":
         if level == "SSC":
             if part == "I":
-                return 900001, 998600, "http://www.fbise.edu.pk/res-ssc-I.php"
+                return 900001, 999999, "http://www.fbise.edu.pk/res-ssc-I.php"
             if part == "II":
-                return 100001, 199000, "http://www.fbise.edu.pk/res-ssc-II.php"
+                return 100001, 199999, "http://www.fbise.edu.pk/res-ssc-II.php"
         elif level == "HSSC":
             if part == "I":
-                return 300001, 395100, "http://www.fbise.edu.pk/res-hssc-I.php"
+                return 300001, 399999, "https://www.fbise.edu.pk/res-hssc-I.php"
             if part == "II":
-                return 500001, 595100, "http://www.fbise.edu.pk/res-hssc-II.php"
+                return 500001, 599999, "http://www.fbise.edu.pk/res-hssc-II.php"
         else:
             logger.critical("Invalid Level, Part or Type. Please check and try again.")
     elif type == "S":
         if level == "SSC":
-            return 200001, 282000, "http://www.fbise.edu.pk/res-sscsup.php"
+            return 200001, 299999, "http://www.fbise.edu.pk/res-sscsup.php"
         if level == "HSSC":
-            return 600001, 695100, "http://www.fbise.edu.pk/res-hsscsup.php"
+            return 600001, 699999, "http://www.fbise.edu.pk/res-hsscsup.php"
     else:
         logger.critical("Invalid Level, Part or Type. Please check and try again.")
 
@@ -106,7 +106,7 @@ def visit(url, rollno, idx):
     This method visits the given site, fills the form, checks if a valid result is generated, adds the valid result 
     and the valid roll number to the valid dict and valid list respectively.
 
-    :param idx: 
+    :param idx:
     :param url: 
     :param rollno: 
     """
