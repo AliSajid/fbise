@@ -115,9 +115,13 @@ def visit(url, rollno, idx):
 
         header = {'User-Agent': str(UA.random),
                   "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
-                  "Accept-Encoding": "gzip, deflate, sdch, br",
-                  "Accept-Language": "en-US,en;q=0.8,ur;q=0.6",
-                  "Connection": "close",
+                  "Accept-Encoding": "gzip, deflate, br",
+                  "Accept-Language": "en-US,en;q=0.9",
+                  "Connection": "keep-alive",
+                  "Content-Type": "application/x-www-form-urlencoded",
+                  "Host": "www.fbise.edu.pk",
+                  "Origin": "https://www.fbise.edu.pk",
+                  "Referer": "https://www.fbise.edu.pk/res-hssc-II.php",
                   "Upgrade-Insecure-Requests": "1",
                   }
         res = post(url, rollno._asdict(), headers=header)
