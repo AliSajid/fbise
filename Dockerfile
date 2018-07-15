@@ -1,4 +1,4 @@
-FROM localhost:5000/continuumio/miniconda3
+FROM localhost:5000/miniconda3
 
 WORKDIR /app
 
