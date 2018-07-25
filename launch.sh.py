@@ -63,7 +63,7 @@ pairs = [PairedRange(pair.level, pair.part, pair.type,
                      return_pairs(pair.lowerbound, pair.upperbound, chunk_size=options.chunk),
                      len(return_pairs(pair.lowerbound, pair.upperbound, chunk_size=options.chunk))) for pair in ranges]
 
-command_string = "docker run --detach -v /d/experiments/fbise/data:/app/fbise/data -v /d/experiments/fbise/logs:/app/logs --name worker{:0>2} localhost:5000/fbise /opt/conda/bin/python /app/fbise/downloader.py -s {} -e {} -l {} -p {} -t {}"
+command_string = "docker run --detach --mount source=2017data,target=/app/fbise/data,type=volume --mount source=2017logs,target=/app/logs,type=volume --name worker{:0>2} localhost:5000/fbise /opt/conda/bin/python /app/fbise/downloader.py -s {} -e {} -l {} -p {} -t {}"
 
 template = """#! /bin/bash
 
