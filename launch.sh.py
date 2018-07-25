@@ -32,21 +32,21 @@ def output_ranges(level, part, type):
     if type == "A":
         if level == "SSC":
             if part == "I":
-                return 900001, 998600, "http://www.fbise.edu.pk/res-ssc-I.php"
+                return 900001, 999999, "http://www.fbise.edu.pk/res-ssc-I.php"
             if part == "II":
-                return 100001, 199000, "http://www.fbise.edu.pk/res-ssc-II.php"
+                return 100001, 199999, "http://www.fbise.edu.pk/res-ssc-II.php"
         elif level == "HSSC":
             if part == "I":
-                return 300001, 395100, "http://www.fbise.edu.pk/res-hssc-I.php"
+                return 300001, 399999, "http://www.fbise.edu.pk/res-hssc-I.php"
             if part == "II":
-                return 500001, 595100, "http://www.fbise.edu.pk/res-hssc-II.php"
+                return 500001, 599999, "http://www.fbise.edu.pk/res-hssc-II.php"
         else:
             print("Invalid Level, Part or Type. Please check and try again.")
     elif type == "S":
         if level == "SSC":
-            return 200001, 282000, "http://www.fbise.edu.pk/res-sscsup.php"
+            return 200001, 299999, "http://www.fbise.edu.pk/res-sscsup.php"
         if level == "HSSC":
-            return 600001, 695100, "http://www.fbise.edu.pk/res-hsscsup.php"
+            return 600001, 699999, "http://www.fbise.edu.pk/res-hsscsup.php"
     else:
         print("Invalid Level, Part or Type. Please check and try again.")
 
@@ -70,10 +70,10 @@ template = """#! /bin/bash
 {}
 """
 
-for pair in pairs:
+for index, pair in enumerate(pairs):
     with open("launch-{}-{}-{}.sh".format(pair.level, pair.part, pair.type), 'w') as f:
         commands = []
         for n in range(pair.numbounds):
             commands.append(
-                command_string.format(n, pair.bounds[n][0], pair.bounds[n][1], pair.level, pair.part, pair.type))
+                command_string.format(str(index) + str(n), pair.bounds[n][0], pair.bounds[n][1], pair.level, pair.part, pair.type))
         f.write(template.format('\n\n'.join(commands)))
