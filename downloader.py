@@ -44,9 +44,9 @@ logging.basicConfig(level=logging.DEBUG,
                     format='%(asctime)s %(name)-12s %(levelname)-8s %(message)s',
                     datefmt='%m-%d-%Y %H:%M:%S,',
                     filename=path.join("logs",
-                                       "{}-{}-{}-data-{:0>6}-{:0>6}.log".format(options.level, options.part,
-                                                                                options.type, options.start,
-                                                                                options.end)),
+                                       "{}-{}-{}-data-{:0>6}-{:0>6}-{}.log".format(options.level, options.part,
+                                                                                   options.type, options.start,
+                                                                                   options.end, 2018)),
                     filemode='a'
                     )
 logger = logging.getLogger(__name__)
@@ -69,7 +69,7 @@ RollNo = namedtuple("RollNo", ['roll_no', "idx", "search"])
 
 # Database Setup
 DBNAME = "{}-{}-{}-data-{:0>6}-{:0>6}-{year}.sqlite".format(options.level, options.part, options.type, options.start,
-                                                            options.end, year=2017)
+                                                            options.end, year=2018)
 DIRNAME = "data"
 
 db.bind('sqlite', path.join(DIRNAME, DBNAME), create_db=True)
@@ -81,21 +81,21 @@ def output_ranges(level, part, type):
     if type == "A":
         if level == "SSC":
             if part == "I":
-                return 900001, 999999, "http://www.fbise.edu.pk/res-ssc-I.php"
+                return 900001, 999999, "https://www.fbise.edu.pk/res-ssc-I.php"
             if part == "II":
-                return 100001, 199999, "http://www.fbise.edu.pk/res-ssc-II.php"
+                return 100001, 199999, "https://www.fbise.edu.pk/res-ssc-II.php"
         elif level == "HSSC":
             if part == "I":
                 return 300001, 399999, "https://www.fbise.edu.pk/res-hssc-I.php"
             if part == "II":
-                return 500001, 599999, "http://www.fbise.edu.pk/res-hssc-II.php"
+                return 500001, 599999, "https://www.fbise.edu.pk/res-hssc-II.php"
         else:
             logger.critical("Invalid Level, Part or Type. Please check and try again.")
     elif type == "S":
         if level == "SSC":
-            return 200001, 299999, "http://www.fbise.edu.pk/res-sscsup.php"
+            return 200001, 299999, "https://www.fbise.edu.pk/res-sscsup.php"
         if level == "HSSC":
-            return 600001, 699999, "http://www.fbise.edu.pk/res-hsscsup.php"
+            return 600001, 699999, "https://www.fbise.edu.pk/res-hsscsup.php"
     else:
         logger.critical("Invalid Level, Part or Type. Please check and try again.")
 
