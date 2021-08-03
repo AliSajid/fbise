@@ -2,4 +2,4 @@ beautifulsoup4==4.5.3
 fake-useragent>=0.1.10
 lxml==3.7.3
 pony>=0.7.1
-requests==2.13.0
+requests==2.20.0
