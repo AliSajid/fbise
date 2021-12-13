@@ -1,5 +1,5 @@
 beautifulsoup4==4.5.3
 fake-useragent>=0.1.10
-lxml==4.6.3
+lxml==4.6.5
 pony>=0.7.1
 requests==2.20.0
